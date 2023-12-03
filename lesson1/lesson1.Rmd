@@ -1,0 +1,92 @@
+---
+title: "Самостійна робота №1"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+## Вступ
+
+Файл із лабораторною роботою №1
+
+## Генератор Парка-Міллера
+
+Генератор Парка-Міллера. Стандартний лінійний конгруентний генератор із заданими значеннями множника і модуля. За зернину візьмемо 1. Також наведені приклади перших 10 значень такого генератора
+
+```{r}
+seed_parkmiller <- 1
+
+park_miller_generator <- function() {
+  a <- 16807
+  m <- 2^31 - 1
+  
+  seed_parkmiller <<- (a * seed_parkmiller) %% m
+  return(seed_parkmiller)
+}
+
+results <- numeric(10)
+for (i in 1:10) {
+  results[i] <- park_miller_generator()
+}
+
+results
+```
+
+## Мій Генератор
+
+Другий приклад заданий власними числами. В даному випадку тут множник : 65521, зернина $2^{10}$ і приріст: 3000. Також наведеном приклад перших 10 значень
+
+```{r}
+seed_mygenerator <- 2^10
+
+my_generator <- function() {
+  m <- 2^31
+  a <- 65521
+  c <- 3000
+  
+  seed_mygenerator <<- (a * seed_mygenerator + c) %% m
+  return(seed_mygenerator)
+}
+
+results <- numeric(10)
+for (i in 1:10) {
+  results[i] <- my_generator()
+}
+
+results
+```
+
+Згенеруємо по 500 елементів в кожній послідовності і перевіримо їх якість використовуючи :
+
+а) порівняння емпіричної функції з теоретичною
+б) діаграми послідовності
+в) діарграми пар та трійок елементів послідовності
+
+```{r}
+n <- 500
+m <- 2^31-1
+
+generated_parkmiller <- numeric(n)
+
+for (i in 1:n) {
+  generated_parkmiller[i] <- my_generator()
+}
+
+X_parkmiller <- generated_parkmiller/m
+
+plot(1:n, X_parkmiller, cex=0.5)
+
+sorted_parkmiller_X <- sort(X_parkmiller)
+
+plot(sorted_parkmiller_X,(1:n)/n, type='s', xlim=c(0,1), ylim=c(0,1))
+abline(a=0,b=1,col="red")
+
+x1<-sorted_parkmiller_X[1:(n-2)]
+x2<-sorted_parkmiller_X[2:(n-1)]
+x3<-sorted_parkmiller_X[3:n]
+library(rgl)
+
+plot3d(x1,x2,x3)
+plot(x1,x3,cex=0.5)
+```
