@@ -2,8 +2,6 @@
 title: "Самостійна робота №1"
 output:
   word_document: default
-  html_document:
-    df_print: paged
 ---
 
 ## Вступ
@@ -63,6 +61,7 @@ results
 б) діаграми послідовності
 в) діарграми пар та трійок елементів послідовності
 
+# Генератор Парка-Міллера
 ```{r}
 n <- 500
 m <- 2^31-1
@@ -70,12 +69,12 @@ m <- 2^31-1
 generated_parkmiller <- numeric(n)
 
 for (i in 1:n) {
-  generated_parkmiller[i] <- my_generator()
+  generated_parkmiller[i] <- park_miller_generator()
 }
 
 X_parkmiller <- generated_parkmiller/m
 
-plot(1:n, X_parkmiller, cex=0.5)
+plot(1:n, X_parkmiller, cex=0.3)
 
 sorted_parkmiller_X <- sort(X_parkmiller)
 
@@ -88,5 +87,42 @@ x3<-sorted_parkmiller_X[3:n]
 library(rgl)
 
 plot3d(x1,x2,x3)
-plot(x1,x3,cex=0.5)
+plot(x1,x3,cex=0.3)
+```
+
+# Мій генератор
+
+```{r}
+n <- 500
+m <- 2^31
+
+generated_myvalues <- numeric(n)
+
+for (i in 1:n) {
+  generated_myvalues[i] <- my_generator()
+}
+
+X_myvalues <- generated_myvalues/m
+
+plot(1:n, X_myvalues, cex=0.3)
+
+sorted_myvalues_X <- sort(X_myvalues)
+
+plot(sorted_myvalues_X,(1:n)/n, type='s', xlim=c(0,1), ylim=c(0,1))
+abline(a=0,b=1,col="red")
+
+x1<-sorted_myvalues_X[1:(n-2)]
+x2<-sorted_myvalues_X[2:(n-1)]
+x3<-sorted_myvalues_X[3:n]
+library(rgl)
+
+plot3d(x1,x2,x3)
+plot(x1,x3,cex=0.3)
+```
+
+
+Бачимо, що обидва генератори проходять наші тести, оскільки ми не бачимо ніякої закономірності в розподілі. Елементи і першої і другої послідовності можемо використовувати для генерації наступної послідовності.
+
+```{r}
+
 ```

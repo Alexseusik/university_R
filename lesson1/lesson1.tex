@@ -115,16 +115,15 @@
 \hypertarget{ux432ux441ux442ux443ux43f}{%
 \subsection{Вступ}\label{ux432ux441ux442ux443ux43f}}
 
-Цей документ описує два генератори псевдовипадкових чисел, реалізованих
-у R.
+Файл із лабораторною роботою №1
 
 \hypertarget{ux433ux435ux43dux435ux440ux430ux442ux43eux440-ux43fux430ux440ux43aux430-ux43cux456ux43bux43bux435ux440ux430}{%
 \subsection{Генератор
 Парка-Міллера}\label{ux433ux435ux43dux435ux440ux430ux442ux43eux440-ux43fux430ux440ux43aux430-ux43cux456ux43bux43bux435ux440ux430}}
 
-Перший генератор - це класичний лінійний конгруентний генератор, відомий
-як генератор Парка-Міллера. Він використовує стартове значення (seed) і
-генерує наступні числа послідовності на основі множника і модуля.
+Генератор Парка-Міллера. Стандартний лінійний конгруентний генератор із
+заданими значеннями множника і модуля. За зернину візьмемо 1. Також
+наведені приклади перших 10 значень такого генератора
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -137,16 +136,28 @@
 \NormalTok{  seed\_parkmiller }\OtherTok{\textless{}\textless{}{-}}\NormalTok{ (a }\SpecialCharTok{*}\NormalTok{ seed\_parkmiller) }\SpecialCharTok{\%\%}\NormalTok{ m}
   \FunctionTok{return}\NormalTok{(seed\_parkmiller)}
 \NormalTok{\}}
+
+\NormalTok{results }\OtherTok{\textless{}{-}} \FunctionTok{numeric}\NormalTok{(}\DecValTok{10}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{) \{}
+\NormalTok{  results[i] }\OtherTok{\textless{}{-}} \FunctionTok{park\_miller\_generator}\NormalTok{()}
+\NormalTok{\}}
+
+\NormalTok{results}
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{ux43cux456ux439-ux432ux43bux430ux441ux43dux438ux439-ux433ux435ux43dux435ux440ux430ux442ux43eux440}{%
-\subsection{Мій Власний
-Генератор}\label{ux43cux456ux439-ux432ux43bux430ux441ux43dux438ux439-ux433ux435ux43dux435ux440ux430ux442ux43eux440}}
+\begin{verbatim}
+##  [1]      16807  282475249 1622650073  984943658 1144108930  470211272
+##  [7]  101027544 1457850878 1458777923 2007237709
+\end{verbatim}
 
-Другий генератор - це власний лінійний конгруентний генератор. Він також
-використовує стартове значення, але з іншими параметрами множника,
-модуля та приросту.
+\hypertarget{ux43cux456ux439-ux433ux435ux43dux435ux440ux430ux442ux43eux440}{%
+\subsection{Мій
+Генератор}\label{ux43cux456ux439-ux433ux435ux43dux435ux440ux430ux442ux43eux440}}
+
+Другий приклад заданий власними числами. В даному випадку тут множник :
+65521, зернина \(2^{10}\) і приріст: 3000. Також наведеном приклад
+перших 10 значень
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -160,10 +171,81 @@
 \NormalTok{  seed\_mygenerator }\OtherTok{\textless{}\textless{}{-}}\NormalTok{ (a }\SpecialCharTok{*}\NormalTok{ seed\_mygenerator }\SpecialCharTok{+}\NormalTok{ c) }\SpecialCharTok{\%\%}\NormalTok{ m}
   \FunctionTok{return}\NormalTok{(seed\_mygenerator)}
 \NormalTok{\}}
+
+\NormalTok{results }\OtherTok{\textless{}{-}} \FunctionTok{numeric}\NormalTok{(}\DecValTok{10}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{) \{}
+\NormalTok{  results[i] }\OtherTok{\textless{}{-}} \FunctionTok{my\_generator}\NormalTok{()}
+\NormalTok{\}}
+
+\NormalTok{results}
 \end{Highlighting}
 \end{Shaded}
 
-Обидва ці генератори можна використовувати для створення послідовностей
-псевдовипадкових чисел у різних наукових та інженерних застосуваннях.
+\begin{verbatim}
+##  [1]   67096504  331014128  939322536  618016224   89349016  196455888
+##  [7] 2116738184 2013601728  393424760 1337476016
+\end{verbatim}
+
+Згенеруємо по 500 елементів в кожній послідовності і перевіримо їх
+якість використовуючи :
+
+а) порівняння емпіричної функції з теоретичною б) діаграми послідовності
+в) діарграми пар та трійок елементів послідовності
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{n }\OtherTok{\textless{}{-}} \DecValTok{500}
+\NormalTok{m }\OtherTok{\textless{}{-}} \DecValTok{2}\SpecialCharTok{\^{}}\DecValTok{31{-}1}
+
+\NormalTok{generated\_parkmiller }\OtherTok{\textless{}{-}} \FunctionTok{numeric}\NormalTok{(n)}
+
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{n) \{}
+\NormalTok{  generated\_parkmiller[i] }\OtherTok{\textless{}{-}} \FunctionTok{my\_generator}\NormalTok{()}
+\NormalTok{\}}
+
+\NormalTok{X\_parkmiller }\OtherTok{\textless{}{-}}\NormalTok{ generated\_parkmiller}\SpecialCharTok{/}\NormalTok{m}
+
+\FunctionTok{plot}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{n, X\_parkmiller, }\AttributeTok{cex=}\FloatTok{0.5}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{lesson1_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sorted\_parkmiller\_X }\OtherTok{\textless{}{-}} \FunctionTok{sort}\NormalTok{(X\_parkmiller)}
+
+\FunctionTok{plot}\NormalTok{(sorted\_parkmiller\_X,(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{n)}\SpecialCharTok{/}\NormalTok{n, }\AttributeTok{type=}\StringTok{\textquotesingle{}s\textquotesingle{}}\NormalTok{, }\AttributeTok{xlim=}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{), }\AttributeTok{ylim=}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{))}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{a=}\DecValTok{0}\NormalTok{,}\AttributeTok{b=}\DecValTok{1}\NormalTok{,}\AttributeTok{col=}\StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{lesson1_files/figure-latex/unnamed-chunk-3-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{x1}\OtherTok{\textless{}{-}}\NormalTok{sorted\_parkmiller\_X[}\DecValTok{1}\SpecialCharTok{:}\NormalTok{(n}\DecValTok{{-}2}\NormalTok{)]}
+\NormalTok{x2}\OtherTok{\textless{}{-}}\NormalTok{sorted\_parkmiller\_X[}\DecValTok{2}\SpecialCharTok{:}\NormalTok{(n}\DecValTok{{-}1}\NormalTok{)]}
+\NormalTok{x3}\OtherTok{\textless{}{-}}\NormalTok{sorted\_parkmiller\_X[}\DecValTok{3}\SpecialCharTok{:}\NormalTok{n]}
+\FunctionTok{library}\NormalTok{(rgl)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in rgl.init(initValue, onlyNULL): RGL: unable to open X11 display
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: 'rgl.init' failed, running with 'rgl.useNULL = TRUE'.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot3d}\NormalTok{(x1,x2,x3)}
+\FunctionTok{plot}\NormalTok{(x1,x3,}\AttributeTok{cex=}\FloatTok{0.5}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{lesson1_files/figure-latex/unnamed-chunk-3-3.pdf}
 
 \end{document}
