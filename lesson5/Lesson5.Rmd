@@ -1,0 +1,134 @@
+---
+title: "Lesson5"
+output: word_document
+---
+
+## Пункт 1
+
+Для пункту 1 опишимо наші логарифмічні функції щільності для наших розподілів і побудуємо наші вибірки. Також змоделюємо наші значення і подивимось на помилку першого роду і другого роду відповідно. 
+
+```{r}
+set.seed(5)
+
+n <- 50
+
+alpha_H0 <- 2
+beta_H0 <- 5
+
+alpha_H1 <- 2
+beta_H1 <- 4 
+
+f0 <- function(x){log(dbeta(x, alpha_H0, beta_H0))}
+f1 <- function(x){log(dbeta(x, alpha_H1, beta_H1))}
+
+lr <- function(x)sum(sapply(x,f1)-sapply(x,f0))
+
+gen0 <- function(n)rbeta(n, alpha_H0, beta_H0)
+gen1 <- function(n)rbeta(n, alpha_H1, beta_H1)
+
+alpha <- 0.05
+
+B<-10000
+lr0<-replicate(B,lr(gen0(n)))
+
+Ca<-quantile(lr0,1-alpha)
+Ca
+```
+Бачимо, що для рівня значущості $\alpha$=0.05 ми отримали поріг тесту $c_{\alpha}$ = 1.137396
+```{r}
+lr1<-replicate(B,lr(gen1(n)))
+mean(lr1<Ca)
+
+mi<-min(c(lr0,lr1))
+mx<- 60
+hist(lr0,breaks=15,probability=T,angle=0,density=12,xlim=c(mi,mx),ylim=c(0,0.33),col="red",xlab="lr",main=" ")
+hist(lr1,probability=T,breaks=15,angle=90,density=12, xlim=c(mi,mx),col="blue",add=T)
+abline(v=Ca)
+```
+
+Також ймовірністьпомилки другого роду складатиме 0.3248 (32.48%). Це досить велике значення, і важко на даному етапі оцінити якість нашого тесту. Також враховуючи гістограми, можна сказати, що якість тесту важко зараз оцінювати. Спробуємо подивитись на різні значення n, змінюючи кількість наших значень. Видозмінимо наш код і додамо різні значення n: 30, 50, 100, 200
+
+```{r}
+set.seed(5)
+
+alpha_H0 <- 2
+beta_H0 <- 5
+
+alpha_H1 <- 2
+beta_H1 <- 4 
+
+f0 <- function(x) log(dbeta(x, alpha_H0, beta_H0))
+f1 <- function(x) log(dbeta(x, alpha_H1, beta_H1))
+
+lr <- function(x) sum(sapply(x, f1) - sapply(x, f0))
+
+gen0 <- function(n) rbeta(n, alpha_H0, beta_H0)
+gen1 <- function(n) rbeta(n, alpha_H1, beta_H1)
+
+alpha <- 0.05
+B <- 10000
+
+sample_sizes <- c(30, 50, 100, 200)
+
+for (n in sample_sizes) {
+  lr0 <- replicate(B, lr(gen0(n)))
+  Ca <- quantile(lr0, 1 - alpha)
+  lr1 <- replicate(B, lr(gen1(n)))
+  p_value <- mean(lr1 < Ca)
+
+  mi <- min(c(lr0, lr1))
+  mx <- 60
+  hist(lr0, breaks = 15, probability = TRUE, angle = 0, density = 12, xlim = c(mi, mx), ylim = c(0, 0.33), col = "red", xlab = "lr", main = paste("Sample size:", n))
+  hist(lr1, probability = TRUE, breaks = 15, angle = 90, density = 12, xlim = c(mi, mx), col = "blue", add = TRUE)
+  abline(v = Ca)
+
+  cat("Sample size:", n, "Critical value:", Ca, "P-value:", p_value, "\n")
+}
+```
+Бачимо, що при збільшені кількості вибірки, а також при розумних рівнях значущості бачимо, що наші дані свідчать на користь альтернативи. 
+
+Перевіримо різні значення, щоб подивитись на найменший розмір n, при якому тест матиме ймовірність помилок першого і другого роду, що не перевищують 0.05
+
+```{r}
+set.seed(5)
+
+
+alpha_H0 <- 2
+beta_H0 <- 5
+alpha_H1 <- 2
+beta_H1 <- 4
+alpha_level <- 0.05
+B <- 10000
+
+generate_data <- function(a, b, n) {
+  return(rbeta(n, a, b))
+}
+
+log_likelihood_ratio <- function(x, a_H0, b_H0, a_H1, b_H1) {
+  return(sum(log(dbeta(x, a_H1, b_H1) / dbeta(x, a_H0, b_H0))))
+}
+
+estimate_errors <- function(n) {
+  data_H0 <- replicate(B, generate_data(alpha_H0, beta_H0, n))
+  lr_H0 <- apply(data_H0, 2, function(x) log_likelihood_ratio(x, alpha_H0, beta_H0, alpha_H1, beta_H1))
+  Ca <- quantile(lr_H0, 1 - alpha_level)
+  alpha_error <- mean(lr_H0 > Ca)
+  data_H1 <- replicate(B, generate_data(alpha_H1, beta_H1, n))
+  lr_H1 <- apply(data_H1, 2, function(x) log_likelihood_ratio(x, alpha_H0, beta_H0, alpha_H1, beta_H1))
+  beta_error <- mean(lr_H1 < Ca)
+  return(c(alpha_error, beta_error))
+}
+
+optimal_n <- NULL
+for (n in seq(10, 150, by=10)) {
+  errors <- estimate_errors(n)
+  cat("n:", n, "Alpha error:", errors[1], "Beta error:", errors[2], "\n")
+  if (errors[1] <= alpha_level && errors[2] <= alpha_level) {
+    optimal_n <- n
+    break
+  }
+}
+optimal_n
+```
+
+Бачимо, що оптимальним значенням, при якому ймовірність помилок першого і другого роду не буде перевищувати 0.05 буде при n = 130

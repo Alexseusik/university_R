@@ -1,12 +1,8 @@
 ---
-title: "Самостійна робота №1"
+title: "Робота №1"
 output:
   word_document: default
 ---
-
-## Вступ
-
-Файл із лабораторною роботою №1
 
 ## Генератор Парка-Міллера
 
@@ -33,23 +29,23 @@ results
 
 ## Мій Генератор
 
-Другий приклад заданий власними числами. В даному випадку тут множник : 65521, зернина $2^{10}$ і приріст: 3000. Також наведеном приклад перших 10 значень
+Другий приклад заданий власними числами. В даному випадку тут множник : 65527, зернина $2^{7}$ і приріст: 3000. Також наведеном приклад перших 10 значень
 
 ```{r}
-seed_mygenerator <- 2^10
+seed_generator <- 2^7
 
-my_generator <- function() {
+generator <- function() {
   m <- 2^31
-  a <- 65521
+  a <- 65527
   c <- 3000
   
-  seed_mygenerator <<- (a * seed_mygenerator + c) %% m
-  return(seed_mygenerator)
+  seed_generator <<- (a * seed_generator + c) %% m
+  return(seed_generator)
 }
 
 results <- numeric(10)
 for (i in 1:10) {
-  results[i] <- my_generator()
+  results[i] <- generator()
 }
 
 results
@@ -61,7 +57,9 @@ results
 б) діаграми послідовності
 в) діарграми пар та трійок елементів послідовності
 
-# Генератор Парка-Міллера
+
+# Парк-Міллер
+
 ```{r}
 n <- 500
 m <- 2^31-1
@@ -80,49 +78,111 @@ sorted_parkmiller_X <- sort(X_parkmiller)
 
 plot(sorted_parkmiller_X,(1:n)/n, type='s', xlim=c(0,1), ylim=c(0,1))
 abline(a=0,b=1,col="red")
-
-x1<-sorted_parkmiller_X[1:(n-2)]
-x2<-sorted_parkmiller_X[2:(n-1)]
-x3<-sorted_parkmiller_X[3:n]
-library(rgl)
-
-plot3d(x1,x2,x3)
-plot(x1,x3,cex=0.3)
 ```
 
-# Мій генератор
+# Генератор із заданими значеннями
 
 ```{r}
 n <- 500
 m <- 2^31
 
-generated_myvalues <- numeric(n)
+generated <- numeric(n)
 
 for (i in 1:n) {
-  generated_myvalues[i] <- my_generator()
+  generated[i] <- generator()
 }
 
-X_myvalues <- generated_myvalues/m
+X_myvalues <- generated/m
 
 plot(1:n, X_myvalues, cex=0.3)
 
-sorted_myvalues_X <- sort(X_myvalues)
+sorted_X <- sort(X_myvalues)
 
-plot(sorted_myvalues_X,(1:n)/n, type='s', xlim=c(0,1), ylim=c(0,1))
+plot(sorted_X,(1:n)/n, type='s', xlim=c(0,1), ylim=c(0,1))
 abline(a=0,b=1,col="red")
-
-x1<-sorted_myvalues_X[1:(n-2)]
-x2<-sorted_myvalues_X[2:(n-1)]
-x3<-sorted_myvalues_X[3:n]
-library(rgl)
-
-plot3d(x1,x2,x3)
-plot(x1,x3,cex=0.3)
 ```
 
 
-Бачимо, що обидва генератори проходять наші тести, оскільки ми не бачимо ніякої закономірності в розподілі. Елементи і першої і другої послідовності можемо використовувати для генерації наступної послідовності.
+Бачимо, що обидва генератори проходять наші тести, оскільки ми не бачимо ніякої закономірності в розподілі. Елементи і першої і другої послідовності можемо використовувати для генерації наступної послідовності. Також для цього створимо 
 
 ```{r}
+dist_generator <- function() {
+  
+  u1 <- generator()/m
+  u1 <- generator()/m
+  
+  xi <- rexp(u1, rate = 1)
+  nu <- runif(u1, 0, 1)
+  
+  z <- xi + nu
+  
+  return(z)
+}
 
+n <- 150
+
+generated <- numeric(n)
+
+for (i in 1:n) {
+  generated[i] <- dist_generator()
+}
+
+X <- generated
+sorted_X <- sort(X)
+
+plot(sorted_X,(1:n)/n,type="s")
 ```
+
+Як бачимо наш генератор дуже добре підходить до стандартного розподілу Коші, це дає нам підстави вважати, що генератор розроблений власноруч (як і лінійний так і генератор розподілу Коші) можна використовувати для реальних задач із моделювання випадкових величин. На останок ще порівняємо використання вбудованих в систему R лінійних генераторів із нашим лінійним генератором. Візьмемо функцію runif яка генерує рівномірно розподілені величини базуючись на лінійному генераторі. Маємо : 
+
+```{r}
+dist_generator <- function() {
+  
+  u1 <- generator()/m
+  u1 <- generator()/m
+  
+  xi <- rexp(u1, rate = 1)
+  nu <- runif(u1, 0, 1)
+  
+  z <- xi + nu
+  
+  return(z)
+}
+
+n <- 150
+
+my_generated <- numeric(n)
+
+for (i in 1:n) {
+  my_generated[i] <- dist_generator()
+}
+
+X <- my_generated
+mysorted_X <- sort(X)
+
+plot(sorted_X,(1:n)/n,type="s")
+```
+
+Ось приклад використання функції runif для генерації 150 випадквоих значень із стандартного розподілу Коші. Порівнюючи графіки, ми бачимо, що і той і той результат є достатнім для використання у професійній діяльності.
+```{r}
+dist_generator <- function() {
+  
+  u <- runif(150)
+  
+  xi <- rexp(u1, rate = 1)
+  nu <- runif(u1, 0, 1)
+  
+  z <- xi + nu
+  
+  return(z)
+}
+
+generated <- dist_generator()
+
+X <- generated
+sorted_X <- sort(X)
+
+plot(sorted_X,(1:n)/n,type="s")
+```
+
+Однак залишається питання ефективності виконання коду. Очевидно, що вбудованні методи завжди є кращими, оскільки вони написані на низькорівнених мовах програмування і виконуються швидше. Тому краще використовувати вбудованні методи
